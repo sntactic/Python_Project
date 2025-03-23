@@ -1,93 +1,101 @@
-from tkinter import *
+from datetime import date
+import sys
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QWidget , QLabel , QLineEdit , QPushButton , QFrame
+
+yposi = 50
+tasks = []
+
+
+" " "             CREATION DE L' OBJET TASK        """   
+
+class Tache:
+    def __init__(self , Frame , intitule , echeance , ypos) :
+        
+        self.frame = QFrame(Frame)
+        self.frame.setFrameShape(QFrame.StyledPanel)
+        self.frame.setGeometry(30 , ypos , 600 , 30)
+
+        self.intit = QLabel(self.frame , text = intitule)
+        self.intit.setStyleSheet("color : black ; font-size : 20px ; background : white ;")
+        self.intit.move(2 , 5)
+        
+        self.eche = QLabel(self.frame , text = echeance)
+        self.eche.setStyleSheet("color : green ; font-size : 20px ; background : white ;")
+        self.eche.move(350 , 5)
+
+        def supp() :
+            global yposi
+            self.frame.deleteLater()
+            yposi -= 50
+
+        self.sup = QPushButton(self.frame , text = "SUPRIMER")
+        self.sup.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
+        self.sup.setGeometry(490 , 5 , 100 , 20)
+        self.sup.clicked.connect(supp)
 
 
 
+" " "             CREATION DE LA FENETRE PRINCIPALE        """    
 
-" " "  CREATION OF THE TKINTER WINDOW  " " "
-window = Tk()
-window.title("TO DO LIST")
-window.geometry("1080x720")
-window.config(background = "white")
+class mywindow(QWidget) :
+    def __init__(self, window , color = "white") :
+        super().__init__()
+        """ STYLE DE BASE SE LA FENETRE """
+        self.window = window
+        self.window.setWindowTitle("TO DO LIST")
+        self.window.setGeometry(150 , 100 , 1080 , 720)
+        self.window.setStyleSheet("background :"+color+";")
 
+        """ ECRIRE L' INTITULÉ """
+        self.texte_intit = QLabel(self.window , text= "INTITULÉ : ")
+        self.texte_intit.setStyleSheet("color : black ; font-size : 25px ; background : white ;")
+        self.texte_intit.move(10 , 30 )
 
-
-
-" " "  CREATION DE L' ARRIERE PLAN  " " "
-largeur = 940
-longueur = 530
-image = PhotoImage(file = "bf_to_do.png").zoom(35).subsample(32)
-planche = Canvas(window , width = largeur , height = longueur , bg = "white" , bd = 0 , highlightthickness = 0)
-planche.create_image(largeur/2 , longueur/2  , image = image)
-planche.place(x = 520 , y = 75) 
-
-
-
-
-
-" " "  CREATION OF THE ENTRY FRAME FOR TASKS  " " "
-task_frame = Frame(window , bg = "blue" , width = 900 , height = 50 )
-task_frame.place(x = 0 , y = 20)
-
-" " "          CREATION OF LABEL FOR TASK NAME       " " "
-task_name = Label(task_frame , text = "intitulé :".upper() , bg = "blue" , fg = "white" , font = ("Courrier" , 20))
-task_name.place(x = 0 , y = 10)
-
-" " "          CREATION OF ENTRY FOR TASK NAME       " " "
-task_entry = Entry(task_frame, bg="black", font=("Courrier", 28), fg="white", highlightthickness = 0, bd=0 , relief=SUNKEN ,
-                                                         width = 18 , border=1)
-task_entry.place(x = 110 , y = 8)
-
-" " "          CREATION OF LABEL FOR TASK DATE       " " "
-task_date = Label(task_frame , text = "echeance :".upper() , bg = "blue" , fg = "white" , font = ("Courrier" , 20))
-task_date.place(x = 460 , y = 8)
-
-" " "          CREATION OF ENTRY FOR TASK DATE       " " "
-date_entry = Entry(task_frame, bg="black", font=("Courrier", 28), fg="green", highlightthickness = 0, bd=0 , relief=SUNKEN ,
-                                                         width = 10 , border=1)
-date_entry.place(x = 590 , y = 8)
-
-" " "          CREATION OF BUTTON FOR CREATING TASK       " " "
-task_button = Button(task_frame , text = "CRÉER" , borderwidth = 0 , fg = "dark blue" , highlightthickness = 0 , relief = SUNKEN ,
-                                                        width = 5 , height = 2 )
-task_button.place(x= 815 , y = 8 )
+        """ ENTRE DE L' INTITULÉ """
+        self.entre_intit = QLineEdit(self.window)
+        self.entre_intit.setGeometry(140 , 33 , 300 , 25)
+        self.entre_intit.setStyleSheet("color : black ;  background : grey ; font-size : 20px ;")
 
 
+        """ ECRIRE DA DATE DE L' ECHEANCE """
+        self.texte_eche = QLabel(self.window , text= "ECHEANCE : ")
+        self.texte_eche.setStyleSheet("color : black ; font-size : 25px ; background : white ;")
+        self.texte_eche.move(470 , 30 )
+
+
+        """ ENTRE DE L' ECHEANCE """
+        self.entre_eche = QLineEdit(self.window)
+        self.entre_eche.setGeometry(620 , 33 , 120 , 25)
+        self.entre_eche.setStyleSheet("color : black ; font-size : 20xp ; background : grey ; font-size : 18px ;")
+
+        " " "             CREATION DE LA FONCTION D' AJOUT DE TACHE        """   
+        def ajout() :
+            global yposi , tasks
+            yposi += 50
+            tex_intit = self.entre_intit.text()
+            tex_eche = self.entre_eche.text()
+            tache = Tache(self.window , tex_intit , tex_eche , yposi)
+            tasks.append(tache)
+            tache.frame.show()
+            
+        """ BOUTTON DE CREATION """
+        self.boutton_creer = QPushButton(self.window , text = "AJOUTER")
+        self.boutton_creer.setGeometry(780 , 33 , 90 , 25)
+        self.boutton_creer.setStyleSheet("color : green ; font-size : 20px ; background : white ;")
+        self.boutton_creer.clicked.connect(ajout)
 
 
 
+"""   L' APPELLE DU PRGRAMME   """
 
+if __name__ == '__main__' :
 
+    app = QApplication(sys.argv)
 
-" " "  CREATION OF TASK CLASS  " " "
+    root = QWidget()
+    window = mywindow(root)
+    root.show()
+    
+    sys.exit(app.exec_())
 
-class Task() :
-    frame = Frame(window , bg = "blue" , width = 20 , height = 50 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-window.mainloop()
