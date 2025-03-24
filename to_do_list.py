@@ -1,38 +1,74 @@
 from datetime import date
 import sys
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QWidget , QLabel , QLineEdit , QPushButton , QFrame
+import csv
 
-yposi = 50
+
 tasks = []
+yposi = 80 
 
 
 " " "             CREATION DE L' OBJET TASK        """   
 
 class Tache:
     def __init__(self , Frame , intitule , echeance , ypos) :
-        
+        self.ypos = ypos
         self.frame = QFrame(Frame)
         self.frame.setFrameShape(QFrame.StyledPanel)
-        self.frame.setGeometry(30 , ypos , 600 , 30)
+        self.frame.setStyleSheet("background : blue;")
+        self.frame.setGeometry(30 , yposi , 600 , 30)
 
         self.intit = QLabel(self.frame , text = intitule)
         self.intit.setStyleSheet("color : black ; font-size : 20px ; background : white ;")
-        self.intit.move(2 , 5)
+        self.intit.move(2 , 4)
         
         self.eche = QLabel(self.frame , text = echeance)
         self.eche.setStyleSheet("color : green ; font-size : 20px ; background : white ;")
-        self.eche.move(350 , 5)
+        self.eche.move(350 , 4)
 
         def supp() :
-            global yposi
+            global yposi , tasks 
             self.frame.deleteLater()
-            yposi -= 50
+            for task in tasks[tasks.index(self) : ] :
+                task.ypos -= 50
+                task.frame.setGeometry(30 , task.ypos , 600 , 30)
+                task.frame.show()
+            tasks.remove(self)
+            yposi = 80 + 50*len(tasks)
+
+            with open("taches.csv" , "r") as sauvetaches :
+                taches = csv.DictReader(sauvetaches)
+                new_taches = []
+                for tache in taches :
+                    if tache['intitu'] != intitule :
+                        new_taches.append(tache['intitu']+","+tache['echea']+"\n")
+                
+                with open("taches.csv" , "w") as sauvetaches :
+                    sauvetaches.write("intitu,echea\n")
+                    for dico in new_taches :
+                        sauvetaches.write(dico)
+
+                
 
         self.sup = QPushButton(self.frame , text = "SUPRIMER")
         self.sup.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
         self.sup.setGeometry(490 , 5 , 100 , 20)
         self.sup.clicked.connect(supp)
+
+
+
+" " "             AFFICHER LES TACHES PRECEDENTES        """  
+
+def majTaches(win) :
+    global yposi , tasks
+    with open("taches.csv" , "r") as sauvetaches :
+        taches = csv.DictReader(sauvetaches)
+        for tache in taches : 
+            tache = Tache(win , tache['intitu'] , tache['echea'] ,yposi)
+            tasks.append(tache)
+            tache.frame.show()
+            yposi = 80 + 50*len(tasks)
+
 
 
 
@@ -69,22 +105,29 @@ class mywindow(QWidget) :
         self.entre_eche.setGeometry(620 , 33 , 120 , 25)
         self.entre_eche.setStyleSheet("color : black ; font-size : 20xp ; background : grey ; font-size : 18px ;")
 
+        majTaches(self.window)
+
         " " "             CREATION DE LA FONCTION D' AJOUT DE TACHE        """   
         def ajout() :
-            global yposi , tasks
-            yposi += 50
+            global tasks ,yposi
             tex_intit = self.entre_intit.text()
             tex_eche = self.entre_eche.text()
-            tache = Tache(self.window , tex_intit , tex_eche , yposi)
+            tache = Tache(self.window , tex_intit , tex_eche ,yposi)
             tasks.append(tache)
+            self.entre_eche.clear()
+            self.entre_intit.clear()
             tache.frame.show()
-            
+            yposi = 80 + 50*len(tasks) 
+
+            with open("taches.csv" , "a") as sauvetaches :
+                sauvetaches.write(tex_intit+","+tex_eche+"\n")
+
+
         """ BOUTTON DE CREATION """
         self.boutton_creer = QPushButton(self.window , text = "AJOUTER")
         self.boutton_creer.setGeometry(780 , 33 , 90 , 25)
         self.boutton_creer.setStyleSheet("color : green ; font-size : 20px ; background : white ;")
         self.boutton_creer.clicked.connect(ajout)
-
 
 
 """   L' APPELLE DU PRGRAMME   """
