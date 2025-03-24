@@ -9,7 +9,6 @@ yposi = 80
 
 
 " " "             CREATION DE L' OBJET TASK        """   
-
 class Tache:
     def __init__(self , Frame , intitule , echeance , ypos) :
         self.ypos = ypos
@@ -26,9 +25,12 @@ class Tache:
         self.eche.setStyleSheet("color : green ; font-size : 20px ; background : white ;")
         self.eche.move(350 , 4)
 
+        " " "             DEFINITION DE LA METHODE DE SUPPRESSION DE TACHES      """   
         def supp() :
             global yposi , tasks 
             self.frame.deleteLater()
+
+            " " "             MISE A JOUR DES TACHES      """
             for task in tasks[tasks.index(self) : ] :
                 task.ypos -= 50
                 task.frame.setGeometry(30 , task.ypos , 600 , 30)
@@ -36,20 +38,20 @@ class Tache:
             tasks.remove(self)
             yposi = 80 + 50*len(tasks)
 
+            " " "             SUPPRESSION DE TACHE DANS LE FICHIER DE SAUVEGARDE       """
             with open("taches.csv" , "r") as sauvetaches :
                 taches = csv.DictReader(sauvetaches)
                 new_taches = []
                 for tache in taches :
                     if tache['intitu'] != intitule :
                         new_taches.append(tache['intitu']+","+tache['echea']+"\n")
-                
+
                 with open("taches.csv" , "w") as sauvetaches :
                     sauvetaches.write("intitu,echea\n")
                     for dico in new_taches :
                         sauvetaches.write(dico)
 
-                
-
+        " " "             CREATION DU BOUTTON DE SUPPRESSION       """   
         self.sup = QPushButton(self.frame , text = "SUPRIMER")
         self.sup.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
         self.sup.setGeometry(490 , 5 , 100 , 20)
@@ -57,8 +59,7 @@ class Tache:
 
 
 
-" " "             AFFICHER LES TACHES PRECEDENTES        """  
-
+" " "             DEFINITION DA LA FONCTION D'AFFICHAGE LES TACHES PRECEDENTES        """  
 def majTaches(win) :
     global yposi , tasks
     with open("taches.csv" , "r") as sauvetaches :
@@ -71,12 +72,11 @@ def majTaches(win) :
 
 
 
-
 " " "             CREATION DE LA FENETRE PRINCIPALE        """    
-
 class mywindow(QWidget) :
     def __init__(self, window , color = "white") :
         super().__init__()
+
         """ STYLE DE BASE SE LA FENETRE """
         self.window = window
         self.window.setWindowTitle("TO DO LIST")
@@ -93,12 +93,10 @@ class mywindow(QWidget) :
         self.entre_intit.setGeometry(140 , 33 , 300 , 25)
         self.entre_intit.setStyleSheet("color : black ;  background : grey ; font-size : 20px ;")
 
-
         """ ECRIRE DA DATE DE L' ECHEANCE """
         self.texte_eche = QLabel(self.window , text= "ECHEANCE : ")
         self.texte_eche.setStyleSheet("color : black ; font-size : 25px ; background : white ;")
         self.texte_eche.move(470 , 30 )
-
 
         """ ENTRE DE L' ECHEANCE """
         self.entre_eche = QLineEdit(self.window)
@@ -107,7 +105,7 @@ class mywindow(QWidget) :
 
         majTaches(self.window)
 
-        " " "             CREATION DE LA FONCTION D' AJOUT DE TACHE        """   
+        " " "             CREATION DE LA D' AJOUT D' AJOUT DE TACHES       """   
         def ajout() :
             global tasks ,yposi
             tex_intit = self.entre_intit.text()
@@ -122,16 +120,15 @@ class mywindow(QWidget) :
             with open("taches.csv" , "a") as sauvetaches :
                 sauvetaches.write(tex_intit+","+tex_eche+"\n")
 
-
-        """ BOUTTON DE CREATION """
+        " " "          BOUTTON DE CREATION """
         self.boutton_creer = QPushButton(self.window , text = "AJOUTER")
         self.boutton_creer.setGeometry(780 , 33 , 90 , 25)
         self.boutton_creer.setStyleSheet("color : green ; font-size : 20px ; background : white ;")
         self.boutton_creer.clicked.connect(ajout)
 
 
-"""   L' APPELLE DU PRGRAMME   """
 
+" " "   L' APPELLE DU PRGRAMME   """
 if __name__ == '__main__' :
 
     app = QApplication(sys.argv)
@@ -141,4 +138,3 @@ if __name__ == '__main__' :
     root.show()
     
     sys.exit(app.exec_())
-
