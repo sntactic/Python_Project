@@ -1,6 +1,6 @@
 from datetime import date
 from PyQt5.QtWidgets import QWidget , QLabel , QLineEdit , QPushButton , QFrame
-import csv
+import csv , os
 
 
 tasks = []
@@ -43,7 +43,7 @@ class Tache:
                 taches = csv.DictReader(sauvetaches)
                 new_taches = []
                 for tache in taches :
-                    if tache['intitu'] != intitule :
+                    if tache['intitu'] != intitule or tache['echea'] != echeance :
                         new_taches.append(tache['intitu']+","+tache['echea']+"\n")
 
                 with open("taches.csv" , "w") as sauvetaches :
@@ -62,13 +62,18 @@ class Tache:
 " " "             DEFINITION DA LA FONCTION D'AFFICHAGE LES TACHES PRECEDENTES        """  
 def majTaches(win) :
     global yposi , tasks
-    with open("taches.csv" , "r") as sauvetaches :
-        taches = csv.DictReader(sauvetaches)
-        for tache in taches : 
-            tache = Tache(win , tache['intitu'] , tache['echea'] ,yposi)
-            tasks.append(tache)
-            tache.frame.show()
-            yposi = 80 + 50*len(tasks)
+
+    if os.path.exists("taches.csv") :
+        with open("taches.csv" , "r") as sauvetaches :
+            taches = csv.DictReader(sauvetaches)
+            for tache in taches : 
+                tache = Tache(win , tache['intitu'] , tache['echea'] ,yposi)
+                tasks.append(tache)
+                tache.frame.show()
+                yposi = 80 + 50*len(tasks)
+    else :
+        with open("taches.csv" , "a") as sauvetaches :
+            sauvetaches.write("intitu,echea\n")
 
 
 
@@ -102,8 +107,8 @@ class mywindow(QWidget) :
         self.entre_eche.setGeometry(680 , 33 , 120 , 25)
         self.entre_eche.setStyleSheet("color : black ; font-size : 20xp ; background : grey ; font-size : 18px ;")
 
-        self.message_label = QLabel(self)
-        self.message_label.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
+        self.message_plein = QLabel(self)
+        self.message_vide = QLabel(self)
 
         majTaches(self)
 
@@ -112,11 +117,21 @@ class mywindow(QWidget) :
             global tasks ,yposi
             tex_intit = self.entre_intit.text()
             tex_eche = self.entre_eche.text()
-            if tex_intit.strip() == "" :
-                self.message_label.setText("vous devez saisir une tache !!!!!!!!!")
-                self.message_label.setGeometry(290 , 10 , 450 , 25)
+            self.message_vide.setGeometry(0,0,0,0)
+            self.message_plein.setGeometry(0,0,0,0)  
+            
+            if len(tasks) == 13 or tex_intit.strip() == "":
+                if len(tasks) == 13 :
+                    self.message_plein.setText("vous avez ateint la limite de tache! passer en mode prenium pour plus de tache")
+                    self.message_plein.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
+                    self.message_plein.setGeometry(200 , 5 , 720 , 20)
+                else :
+                    self.message_vide.setText("vous devez saisir une tache !!!!!!!!!")
+                    self.message_vide.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
+                    self.message_vide.setGeometry(350 , 5 , 300 , 20)
             else :
-                self.message_label.clear()
+                self.message_vide.setGeometry(0,0,0,0)
+                self.message_plein.setGeometry(0,0,0,0)
                 tache = Tache(self , tex_intit , tex_eche ,yposi)
                 tasks.append(tache)
                 self.entre_eche.clear()
