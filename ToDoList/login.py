@@ -23,6 +23,7 @@ class LoginWindow(QWidget):
         self.password_label.move(280 , 280)
 
         self.password_input = QLineEdit(self)
+        self.password_input.setEchoMode(QLineEdit.Password)
         self.password_input.setStyleSheet("color : black ; font-size : 25px ; background : grey ;")
         self.password_input.setGeometry(450 , 280 , 300 , 25)
         
@@ -33,9 +34,9 @@ class LoginWindow(QWidget):
             global log
             username = self.username_input.text()
             password = self.password_input.text()
-            if username != "admin" or password != "0000":
+            if username != "" or password != "":
                 self.message_label.setText("Nom d'utilisateur ou mot de passe incorrect !!!!!!!!!")
-                self.message_label.setGeometry(290 , 140 , 450 , 25)
+                self.message_label.setGeometry(300 , 140 , 450 , 25)
             else :
                 window = mywindow().show()
                 self.deleteLater()
@@ -43,7 +44,7 @@ class LoginWindow(QWidget):
 
         # Connexion du bouton à la méthode de connexion
         self.login_button = QPushButton(self , text = "Se connecter")
-        self.login_button.setGeometry(420 , 380 , 200 , 25)
+        self.login_button.setGeometry(420 , 380 , 160 , 25)
         self.login_button.setStyleSheet("color : blue ; font-size : 20px ; background : white ;")
         self.login_button.clicked.connect(handle_login)
 
