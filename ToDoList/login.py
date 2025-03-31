@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel
+from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel , QHBoxLayout , QVBoxLayout
 from to_do_list import mywindow
 
 class LoginWindow(QWidget):
@@ -6,26 +6,50 @@ class LoginWindow(QWidget):
         super().__init__()
         
         self.setWindowTitle("Page de Connexion")
-        self.setGeometry(150, 100, 1080, 720)
         self.setStyleSheet("background : white;")
+        self.move(220 , 100)
+        
+
+        vlayout = QVBoxLayout()
+        vlayout.setSpacing(100)
+        vlayout.setContentsMargins(0, 200, 0, 200)
+        self.setLayout(vlayout)
+
+        hlayout1 = QHBoxLayout()
+        hlayout1.setContentsMargins(200, 0, 200, 0)
+        hlayout1.setSpacing(20)
+        vlayout.addLayout(hlayout1)
+
+        hlayout2 = QHBoxLayout()
+        hlayout2.setContentsMargins(250, 0 , 250, 0)
+        hlayout2.setSpacing(30)
+        vlayout.addLayout(hlayout2)
+
+        hlayout3 = QHBoxLayout()
+        hlayout3.setContentsMargins(440, 0, 440, 0)
+        vlayout.addLayout(hlayout3)
+
+
+        vlayout.addLayout(hlayout2)
         
         # Création des éléments de l'interface
-        self.username_label = QLabel(self , text = "Nom d'utilisateur:")
+        self.username_label = QLabel(text = "Nom d'utilisateur")
         self.username_label.setStyleSheet("color : black ; font-size : 20px ; background : white ;")
-        self.username_label.move(280 , 200)
-        
-        self.username_input = QLineEdit(self)
-        self.username_input.setStyleSheet("color : black ; font-size : 25px ; background : grey ;")
-        self.username_input.setGeometry(450 , 200 , 300 , 25)
-        
-        self.password_label = QLabel(self , text = "Mot de passe:")
-        self.password_label.setStyleSheet("color : black ; font-size : 20px ; background : white ;")
-        self.password_label.move(280 , 280)
+        hlayout1.addWidget(self.username_label)
 
-        self.password_input = QLineEdit(self)
+        self.username_input = QLineEdit()
+        self.username_input.setStyleSheet("color : black ; font-size : 18px ; background : grey ;")
+        hlayout1.addWidget(self.username_input)
+
+        self.password_label = QLabel(text = "Mot de passe")
+        self.password_label.setStyleSheet("color : black ; font-size : 20px ; background : white ;")
+        hlayout2.addWidget(self.password_label)
+
+        self.password_input = QLineEdit()
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_input.setStyleSheet("color : black ; font-size : 25px ; background : grey ;")
-        self.password_input.setGeometry(450 , 280 , 300 , 25)
+        hlayout2.addWidget(self.password_input)
+
         
         self.message_label = QLabel(self)
         self.message_label.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
@@ -41,10 +65,10 @@ class LoginWindow(QWidget):
                 window = mywindow().show()
                 self.deleteLater()
 
-
         # Connexion du bouton à la méthode de connexion
-        self.login_button = QPushButton(self , text = "Se connecter")
-        self.login_button.setGeometry(420 , 380 , 160 , 25)
+        self.login_button = QPushButton(text = "Se connecter")
         self.login_button.setStyleSheet("color : blue ; font-size : 20px ; background : white ;")
         self.login_button.clicked.connect(handle_login)
 
+        hlayout3.addWidget(self.login_button)
+        

@@ -1,6 +1,7 @@
 from datetime import date
-from PyQt5.QtWidgets import QWidget , QScrollArea , QLabel , QLineEdit , QPushButton , QFrame
+from PyQt5.QtWidgets import QWidget , QScrollArea , QLabel , QLineEdit , QPushButton , QFrame , QVBoxLayout
 from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QPixmap
 from datetime import datetime , timedelta
 import csv , os
 
@@ -129,6 +130,17 @@ class mywindow(QWidget) :
         self.setMinimumSize(1080 , 720)
         self.setStyleSheet("background :"+color+";")
 
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0,0,0,0)
+        self.setLayout(layout)
+
+        label = QLabel(self)
+        pixmap = QPixmap('background.png')
+        label.setPixmap(pixmap)
+        label.setScaledContents(True)
+        
+        layout.addWidget(label)
+
         self.frame = QFrame(self)
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setStyleSheet("background : blue;")
@@ -155,15 +167,20 @@ class mywindow(QWidget) :
         self.entre_eche.setStyleSheet("color : black ; font-size : 20xp ; background : white ; font-size : 18px ;")
 
         self.message_vide = QLabel(self)
+        self.message_vide.setGeometry(0,0,0,0)
 
         """ MISE A JOUR DES TACHES SAUVEGARDEES"""  
         scroll_win = QWidget()
+        #scroll_win.setStyleSheet("background-image: url('/Users/macbookair/Documents/github/Python_project_evo/ToDoList/background.png')"
+                                # ";background-repeat: no-repeat;background-position: center;background-size: cover; ")
+
+    
 
         majTaches(scroll_win)
 
         """ CREATION DU CHAMP DE DEROULEMENT """        
         self.scroll_area = QScrollArea(self)
-        self.scroll_area.setStyleSheet("background : white")
+        self.scroll_area.setStyleSheet("background-color: rgba(0, 0, 0, 0);")
         self.scroll_area.setGeometry(180 , 80 , 730 , 650)
         self.scroll_area.setWidgetResizable(True)
 
