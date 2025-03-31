@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel , QHBoxLayout , QVBoxLayout
-from to_do_list import mywindow
+from Main import mywindow
 
 class LoginWindow(QWidget):
     def __init__(self):
