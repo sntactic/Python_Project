@@ -1,6 +1,6 @@
-from datetime import date
-from PyQt5.QtWidgets import QWidget , QScrollArea , QLabel , QLineEdit , QPushButton , QFrame , QVBoxLayout , QHBoxLayout
-from PyQt5.QtCore import QTimer
+from datetime import timedelta
+from PyQt5.QtWidgets import QWidget , QScrollArea , QLabel , QLineEdit , QPushButton , QDateTimeEdit , QVBoxLayout , QHBoxLayout
+from PyQt5.QtCore import QTimer , QDateTime
 from PyQt5.QtGui import QPixmap, QPalette, QBrush
 from datetime import datetime , timedelta
 import csv , os
@@ -121,6 +121,7 @@ class mywindow(QWidget) :
         self.taches = []
         """ STYLE DE BASE SE LA FENETRE """
         self.setWindowTitle("TO DO LIST")
+        self.resize(1080 , 720)
 
         layout = QVBoxLayout(self)
         layout.setSpacing(10)
@@ -152,8 +153,10 @@ class mywindow(QWidget) :
         self.frame.addWidget(self.texte_eche)
 
         """ ENTRE DE L' ECHEANCE """
-        self.entre_eche = QLineEdit()
-        self.entre_eche.setStyleSheet("color : black ; font-size : 20xp ; background : white ; font-size : 18px ;")
+        self.entre_eche = QDateTimeEdit()
+        self.entre_eche.setCalendarPopup(True)
+        self.entre_eche.setDateTime(QDateTime.currentDateTime().addDays(1))
+        self.entre_eche.setStyleSheet("color : black ; font-size : 17px ; background-color : white")
         self.frame.addWidget(self.entre_eche)
 
         self.message_vide = QLabel(self)
@@ -166,7 +169,6 @@ class mywindow(QWidget) :
         #scroll_win.setStyleSheet("background-image: url('/Users/macbookair/Documents/github/Python_project_evo/ToDoList/background.png')"
                                 # ";background-repeat: no-repeat;background-position: center;background-size: cover; ")
 
-    
 
         majTaches(win_layout)
 
@@ -183,7 +185,7 @@ class mywindow(QWidget) :
         def ajout() :
             global yposi
             tex_intit = self.entre_intit.text()
-            tex_eche = self.entre_eche.text()
+            tex_eche = self.entre_eche.dateTime().toString("yyyy-MM-dd HH:mm:ss")
             self.message_vide.setGeometry(0,0,0,0)
             
             if tex_intit.strip() == "":

@@ -58,7 +58,7 @@ class LoginWindow(QWidget):
             global log
             username = self.username_input.text()
             password = self.password_input.text()
-            if username != "" or password != "":
+            if username != "khadim" or password != "0000":
                 self.message_label.setText("Nom d'utilisateur ou mot de passe incorrect !!!!!!!!!")
                 self.message_label.setGeometry(300 , 140 , 450 , 25)
             else :
