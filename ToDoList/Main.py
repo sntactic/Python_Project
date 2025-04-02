@@ -5,6 +5,7 @@ from PyQt5.QtCore import QTimer , QDateTime , Qt
 from PyQt5.QtGui import QPixmap, QPalette, QBrush 
 from datetime import datetime , timedelta
 import csv , os
+from mail import send_mail
 
 tasks = []
 
@@ -21,7 +22,7 @@ class Tache:
         self.eche = QLabel(text = "--------")
         self.eche.setStyleSheet("color : blue ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
         self.frame.addWidget(self.eche)
-        
+
 
         def update_time() :
             temps = datetime.strptime(echeance, "%Y-%m-%d %H:%M:%S")
@@ -38,9 +39,11 @@ class Tache:
                 else :
                     self.eche.setStyleSheet("color : orange ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ") 
             else :
-                if self.eche != "expirée" :
-                    self.eche.setText("expirée")
-                    self.eche.setStyleSheet("color : red ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
+                self.eche.setText("expirée")
+                self.eche.setStyleSheet("color : red ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
+                if restime > timedelta(days = 0, hours = 0, minutes = 0, seconds = -0.1)  :
+                    send_mail(intitule)
+
 
         def est_date(chaine, format_date="%Y-%m-%d %H:%M:%S"):
             try:
