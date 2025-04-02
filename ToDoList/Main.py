@@ -1,17 +1,16 @@
 from datetime import timedelta
-from PyQt5.QtWidgets import QWidget , QScrollArea , QLabel , QLineEdit , QPushButton , QDateTimeEdit , QVBoxLayout , QHBoxLayout
-from PyQt5.QtCore import QTimer , QDateTime
-from PyQt5.QtGui import QPixmap, QPalette, QBrush
+from PyQt5.QtWidgets import (QWidget , QScrollArea , QLabel , QLineEdit ,
+                              QPushButton , QDateTimeEdit , QVBoxLayout , QHBoxLayout)
+from PyQt5.QtCore import QTimer , QDateTime , Qt
+from PyQt5.QtGui import QPixmap, QPalette, QBrush 
 from datetime import datetime , timedelta
 import csv , os
 
 tasks = []
-yposi = 5
 
 " " "             CREATION DE L' OBJET TASK        """   
 class Tache:
-    def __init__(self , Frame , intitule , echeance , ypos) :
-        self.ypos = ypos
+    def __init__(self , Frame , intitule , echeance ) :
 
         self.frame = QHBoxLayout()
 
@@ -39,9 +38,9 @@ class Tache:
                 else :
                     self.eche.setStyleSheet("color : orange ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ") 
             else :
-                self.eche.setText("expirée")
-                self.eche.setStyleSheet("color : red ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
-
+                if self.eche != "expirée" :
+                    self.eche.setText("expirée")
+                    self.eche.setStyleSheet("color : red ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
 
         def est_date(chaine, format_date="%Y-%m-%d %H:%M:%S"):
             try:
@@ -61,18 +60,12 @@ class Tache:
 
         " " "             DEFINITION DE LA METHODE DE SUPPRESSION DE TACHES      """   
         def supp() :
-            global yposi , tasks 
+            global tasks 
             self.intit.deleteLater()
             self.eche.deleteLater()
             self.sup.deleteLater()
             self.timer.deleteLater()
             self.frame.deleteLater()
-
-            " " "             MISE A JOUR DES TACHES      """
-            for task in tasks[tasks.index(self) : ] :
-                task.ypos -= 50
-            tasks.remove(self)
-            yposi = 5 + 50*len(tasks)
 
             " " "             SUPPRESSION DE TACHE DANS LE FICHIER DE SAUVEGARDE       """
             with open("taches.csv" , "r") as sauvetaches :
@@ -98,15 +91,14 @@ class Tache:
 
 " " "             DEFINITION DA LA FONCTION D'AFFICHAGE LES TACHES PRECEDENTES        """  
 def majTaches(scroll_win) :
-    global yposi , tasks
+    global tasks
 
     if os.path.exists("taches.csv") :
         with open("taches.csv" , "r") as sauvetaches :
             taches = csv.DictReader(sauvetaches)
             for tache in taches : 
-                tache = Tache(scroll_win , tache['intitu'] , tache['echea'] ,yposi)
+                tache = Tache(scroll_win , tache['intitu'] , tache['echea'] )
                 tasks.append(tache)
-                yposi = 5 + 50*len(tasks)
     else :
         with open("taches.csv" , "a") as sauvetaches :
             sauvetaches.write("intitu,echea\n")
@@ -115,7 +107,7 @@ def majTaches(scroll_win) :
 
 " " "             CREATION DE LA FENETRE PRINCIPALE        """    
 class mywindow(QWidget) :
-    def __init__(self, color = "white") :
+    def __init__(self) :
         super().__init__()
         global tasks
         self.taches = []
@@ -134,29 +126,22 @@ class mywindow(QWidget) :
         """mise en place des elements fonctionnels"""
 
         self.frame = QHBoxLayout()
+        self.frame.setSpacing(20)
         layout.addLayout(self.frame)
-
-        """ ECRIRE L' INTITULÉ """
-        self.texte_intit = QLabel(text= "INTITULÉ : ".lower())
-        self.texte_intit.setStyleSheet("color : black ; font-size : 25px ; background-color: rgba(0, 0, 0, 0) ;")
-        self.frame.addWidget(self.texte_intit)
 
         """ ENTRE DE L' INTITULÉ """
         self.entre_intit = QLineEdit()
-        self.entre_intit.setStyleSheet("color : black ;  background : white ; font-size : 20px ;")
+        self.entre_intit.setPlaceholderText("Entrez une tache")
+        self.entre_intit.setStyleSheet("color : black ;background: white ; font-size : 17px ;")
+        self.entre_intit.setMinimumHeight(35)
         self.frame.addWidget(self.entre_intit)
-        
-
-        """ ECRIRE DA DATE DE L' ECHEANCE """
-        self.texte_eche = QLabel(text= "ÉCHÉANCE : ".lower())
-        self.texte_eche.setStyleSheet("color : black ; font-size : 25px ; background-color: rgba(0, 0, 0, 0) ;")
-        self.frame.addWidget(self.texte_eche)
 
         """ ENTRE DE L' ECHEANCE """
         self.entre_eche = QDateTimeEdit()
+        self.entre_eche.setFixedHeight(35)
+        self.entre_eche.setStyleSheet("font-size: 27px; padding: 4px; color : white ; background-color: grey")
         self.entre_eche.setCalendarPopup(True)
         self.entre_eche.setDateTime(QDateTime.currentDateTime().addDays(1))
-        self.entre_eche.setStyleSheet("color : black ; font-size : 17px ; background-color : white")
         self.frame.addWidget(self.entre_eche)
 
         self.message_vide = QLabel(self)
@@ -183,7 +168,6 @@ class mywindow(QWidget) :
 
         " " "             CREATION DE LA D' AJOUT D' AJOUT DE TACHES       """   
         def ajout() :
-            global yposi
             tex_intit = self.entre_intit.text()
             tex_eche = self.entre_eche.dateTime().toString("yyyy-MM-dd HH:mm:ss")
             self.message_vide.setGeometry(0,0,0,0)
@@ -194,12 +178,11 @@ class mywindow(QWidget) :
                 self.message_vide.setGeometry(350 , 5 , 300 , 20)
             else :
                 self.message_vide.setGeometry(0,0,0,0)
-                tache = Tache(win_layout , tex_intit , tex_eche ,yposi)
+                tache = Tache(win_layout , tex_intit , tex_eche )
                 tasks.append(tache)
                 self.taches.append(tache)
                 self.entre_eche.clear()
                 self.entre_intit.clear()
-                yposi = 5 + 50*len(tasks)
                 with open("taches.csv" , "a") as sauvetaches :
                     sauvetaches.write(tex_intit+","+tex_eche+"\n")
 
@@ -208,3 +191,10 @@ class mywindow(QWidget) :
         self.boutton_creer.setStyleSheet("color : green ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
         self.boutton_creer.clicked.connect(ajout)
         self.frame.addWidget(self.boutton_creer)
+
+        self.installEventFilter(self)
+    def eventFilter(self, obj, event):
+        if event.type() == event.KeyPress and event.key() == Qt.Key_Return:
+            self.boutton_creer.click() 
+            return True 
+        return super().eventFilter(obj, event)

@@ -8,6 +8,7 @@ class LoginWindow(QWidget):
         self.setWindowTitle("Page de Connexion")
         self.setStyleSheet("background : white;")
         self.move(220 , 100)
+        self.resize(1080 , 720)
         
 
         vlayout = QVBoxLayout()
@@ -58,7 +59,7 @@ class LoginWindow(QWidget):
             global log
             username = self.username_input.text()
             password = self.password_input.text()
-            if username != "khadim" or password != "0000":
+            if username != "" or password != "":
                 self.message_label.setText("Nom d'utilisateur ou mot de passe incorrect !!!!!!!!!")
                 self.message_label.setGeometry(300 , 140 , 450 , 25)
             else :
