@@ -7,13 +7,12 @@ class LoginWindow(QWidget):
         
         self.setWindowTitle("Page de Connexion")
         self.setStyleSheet("background : white;")
-        self.move(220 , 100)
+        self.move(200 , 100)
         self.resize(1080 , 720)
         
 
         vlayout = QVBoxLayout()
         vlayout.setSpacing(100)
-        vlayout.setContentsMargins(0, 200, 0, 200)
         self.setLayout(vlayout)
 
         hlayout1 = QHBoxLayout()

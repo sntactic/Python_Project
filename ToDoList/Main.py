@@ -116,6 +116,7 @@ class mywindow(QWidget) :
         self.taches = []
         """ STYLE DE BASE SE LA FENETRE """
         self.setWindowTitle("TO DO LIST")
+        self.move(200 , 100)
         self.resize(1080 , 720)
 
         layout = QVBoxLayout(self)
@@ -152,6 +153,7 @@ class mywindow(QWidget) :
 
         """ MISE A JOUR DES TACHES SAUVEGARDEES"""  
         scroll_win = QWidget()
+        scroll_win.setStyleSheet("background-color: rgba(0, 0, 0, 0);")
         win_layout = QVBoxLayout(scroll_win)
         win_layout.setSpacing(20)
         #scroll_win.setStyleSheet("background-image: url('/Users/macbookair/Documents/github/Python_project_evo/ToDoList/background.png')"
@@ -162,7 +164,6 @@ class mywindow(QWidget) :
 
         """ CREATION DU CHAMP DE DEROULEMENT """        
         self.scroll_area = QScrollArea()
-        self.scroll_area.setStyleSheet("background-color: rgba(0, 0, 0, 0);")
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setWidget(scroll_win)
         
