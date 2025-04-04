@@ -1,7 +1,6 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
 def send_mail(texte) :
     smtp_server = "smtp.gmail.com"
     smtp_port = 587

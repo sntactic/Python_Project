@@ -4,8 +4,25 @@ from PyQt5.QtWidgets import (QWidget , QListWidget , QLabel , QLineEdit ,QListWi
 from PyQt5.QtCore import QTimer , QDateTime , Qt
 from PyQt5.QtGui import QPixmap, QPalette, QBrush 
 from datetime import datetime , timedelta
-import csv , os
+import csv , os , sys
 from mail import send_mail
+
+
+
+
+def resource_path(relative_path):
+    """Donne le chemin correct vers un fichier, même dans une app PyInstaller"""
+    try:
+        base_path = sys._MEIPASS  
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+image_path = resource_path("background1.png")
+csv_path = resource_path("taches.csv")
+
+
+
 
 tasks = []
 
@@ -50,7 +67,6 @@ class Tache:
                 if restime > timedelta(days = 0, hours = 0, minutes = 0, seconds = -0.1)  :
                     send_mail(intitule)
 
-
         def est_date(chaine, format_date="%Y-%m-%d %H:%M:%S"):
             try:
                 datetime.strptime(chaine, format_date)
@@ -77,14 +93,14 @@ class Tache:
             self.wframe.deleteLater()
 
             " " "             SUPPRESSION DE TACHE DANS LE FICHIER DE SAUVEGARDE       """
-            with open("taches.csv" , "r") as sauvetaches :
+            with open(csv_path , "r") as sauvetaches :
                 taches = csv.DictReader(sauvetaches)
                 new_taches = []
                 for tache in taches :
                     if tache['intitu'] != intitule or tache['echea'] != echeance :
                         new_taches.append(tache['intitu']+","+tache['echea']+"\n")
 
-                with open("taches.csv" , "w") as sauvetaches :
+                with open(csv_path , "w") as sauvetaches :
                     sauvetaches.write("intitu,echea\n")
                     for dico in new_taches :
                         sauvetaches.write(dico)
@@ -102,14 +118,14 @@ class Tache:
 def majTaches(scroll_win) :
     global tasks
 
-    if os.path.exists("taches.csv") :
-        with open("taches.csv" , "r") as sauvetaches :
+    if os.path.exists(csv_path) :
+        with open(csv_path , "r") as sauvetaches :
             taches = csv.DictReader(sauvetaches)
             for tache in taches : 
                 tache = Tache(scroll_win , tache['intitu'] , tache['echea'] )
                 tasks.append(tache)
     else :
-        with open("taches.csv" , "a") as sauvetaches :
+        with open(csv_path , "a") as sauvetaches :
             sauvetaches.write("intitu,echea\n")
 
 
@@ -129,7 +145,7 @@ class mywindow(QWidget) :
         layout.setSpacing(10)
 
         palette = QPalette()
-        pixmap = QPixmap("background1.png") 
+        pixmap = QPixmap(image_path) 
         palette.setBrush(QPalette.ColorRole.Window, QBrush(pixmap))
         self.setPalette(palette)
 
@@ -142,14 +158,14 @@ class mywindow(QWidget) :
         """ ENTRE DE L' INTITULÉ """
         self.entre_intit = QLineEdit()
         self.entre_intit.setPlaceholderText("Entrez une tache")
-        self.entre_intit.setStyleSheet("color : black ;background: white ; font-size : 17px ;")
+        self.entre_intit.setStyleSheet("color : black ;background: white ; font-size : 17px ;border: 2px solid #000000;border-radius: 6px;padding: 4px;")
         self.entre_intit.setMinimumHeight(35)
         self.frame.addWidget(self.entre_intit)
 
         """ ENTRE DE L' ECHEANCE """
         self.entre_eche = QDateTimeEdit()
         self.entre_eche.setFixedHeight(35)
-        self.entre_eche.setStyleSheet("font-size: 27px; padding: 4px; color : white ; background-color: grey")
+        self.entre_eche.setStyleSheet("font-size: 27px;padding: 4px;")
         self.entre_eche.setCalendarPopup(True)
         self.entre_eche.setDateTime(QDateTime.currentDateTime().addDays(1))
         self.frame.addWidget(self.entre_eche)
@@ -159,7 +175,7 @@ class mywindow(QWidget) :
 
         """ CREATION DU CHAMP DE DEROULEMENT """ 
         win_task =  QListWidget(self)
-        win_task.setStyleSheet("background-color: rgba(0, 0, 0, 0) ; border : 2px")
+        win_task.setStyleSheet("background-color: rgba(0, 0, 0, 0); ")
         layout.addWidget(win_task) 
 
         """ MISE A JOUR DES TACHES SAUVEGARDEES"""  
@@ -183,7 +199,7 @@ class mywindow(QWidget) :
                 self.taches.append(tache)
                 self.entre_eche.clear()
                 self.entre_intit.clear()
-                with open("taches.csv" , "a") as sauvetaches :
+                with open(csv_path , "a") as sauvetaches :
                     sauvetaches.write(tex_intit+","+tex_eche+"\n")
 
         " " "          BOUTTON DE CREATION """
