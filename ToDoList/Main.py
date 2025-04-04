@@ -1,5 +1,5 @@
 from datetime import timedelta
-from PyQt5.QtWidgets import (QWidget , QScrollArea , QLabel , QLineEdit ,
+from PyQt5.QtWidgets import (QWidget , QListWidget , QLabel , QLineEdit ,QListWidgetItem,
                               QPushButton , QDateTimeEdit , QVBoxLayout , QHBoxLayout)
 from PyQt5.QtCore import QTimer , QDateTime , Qt
 from PyQt5.QtGui import QPixmap, QPalette, QBrush 
@@ -14,6 +14,8 @@ class Tache:
     def __init__(self , Frame , intitule , echeance ) :
 
         self.frame = QHBoxLayout()
+        self.wframe = QWidget()
+        self.wframe.setLayout(self.frame)
 
         self.intit = QLabel(text = intitule)
         self.intit.setStyleSheet("color : blue ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
@@ -23,6 +25,10 @@ class Tache:
         self.eche.setStyleSheet("color : blue ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
         self.frame.addWidget(self.eche)
 
+        item = QListWidgetItem()
+        item.setSizeHint(self.wframe.sizeHint())
+        Frame.addItem(item)
+        Frame.setItemWidget(item, self.wframe)
 
         def update_time() :
             temps = datetime.strptime(echeance, "%Y-%m-%d %H:%M:%S")
@@ -57,8 +63,6 @@ class Tache:
         if est_date(echeance) :
             self.timer.timeout.connect(update_time)
             self.timer.start(100)
-        
-
 
 
         " " "             DEFINITION DE LA METHODE DE SUPPRESSION DE TACHES      """   
@@ -69,6 +73,8 @@ class Tache:
             self.sup.deleteLater()
             self.timer.deleteLater()
             self.frame.deleteLater()
+            Frame.takeItem(Frame.row(item))
+            self.wframe.deleteLater()
 
             " " "             SUPPRESSION DE TACHE DANS LE FICHIER DE SAUVEGARDE       """
             with open("taches.csv" , "r") as sauvetaches :
@@ -88,7 +94,7 @@ class Tache:
         self.sup.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
         self.sup.clicked.connect(supp)
         self.frame.addWidget(self.sup)
-        Frame.addLayout(self.frame)
+
 
 
 
@@ -151,24 +157,14 @@ class mywindow(QWidget) :
         self.message_vide = QLabel(self)
         self.message_vide.setGeometry(0,0,0,0)
 
+        """ CREATION DU CHAMP DE DEROULEMENT """ 
+        win_task =  QListWidget(self)
+        win_task.setStyleSheet("background-color: rgba(0, 0, 0, 0) ; border : 2px")
+        layout.addWidget(win_task) 
+
         """ MISE A JOUR DES TACHES SAUVEGARDEES"""  
-        scroll_win = QWidget()
-        scroll_win.setStyleSheet("background-color: rgba(0, 0, 0, 0);")
-        win_layout = QVBoxLayout(scroll_win)
-        win_layout.setSpacing(20)
-        #scroll_win.setStyleSheet("background-image: url('/Users/macbookair/Documents/github/Python_project_evo/ToDoList/background.png')"
-                                # ";background-repeat: no-repeat;background-position: center;background-size: cover; ")
 
-
-        majTaches(win_layout)
-
-        """ CREATION DU CHAMP DE DEROULEMENT """        
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setWidget(scroll_win)
-        
-        layout.addWidget(self.scroll_area)
-
+        majTaches(win_task)
 
         " " "             CREATION DE LA D' AJOUT D' AJOUT DE TACHES       """   
         def ajout() :
@@ -182,7 +178,7 @@ class mywindow(QWidget) :
                 self.message_vide.setGeometry(350 , 5 , 300 , 20)
             else :
                 self.message_vide.setGeometry(0,0,0,0)
-                tache = Tache(win_layout , tex_intit , tex_eche )
+                tache = Tache(win_task , tex_intit , tex_eche )
                 tasks.append(tache)
                 self.taches.append(tache)
                 self.entre_eche.clear()
