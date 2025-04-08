@@ -1,6 +1,16 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel , QHBoxLayout , QVBoxLayout , QApplication
 from Main import mywindow
-import json , os
+import json , os , sys
+
+def resource_path(relative_path):
+    """Donne le chemin correct vers un fichier, même dans une app PyInstaller"""
+    try:
+        base_path = sys._MEIPASS  
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+log_path = resource_path("Logs.json")
 
 class subs(QWidget):
     def __init__(self):
@@ -82,7 +92,7 @@ class subs(QWidget):
             username = self.username_input.text()
 
             
-            with open("Logs.json" , "r", encoding = 'utf-8') as log :
+            with open(log_path  , "r", encoding = 'utf-8') as log :
                 if os.path.getsize("Logs.json") == 0 :
                     jregis = {}
                 else :
@@ -97,7 +107,7 @@ class subs(QWidget):
                         self.message_label.setGeometry(300 , 30 , 450 , 25)
                     else :
                         jregis[mail] = [password , "{}.csv".format(mail)]
-                        with open("Logs.json" , "w", encoding = 'utf-8') as log :
+                        with open(log_path  , "w", encoding = 'utf-8') as log :
                             json.dump(jregis , log , indent = 4)
                         self.message_label.setText("Vous etes inscrit, Vous pouvez retourner vous connecter")
                         self.message_label.setStyleSheet("color : green ; font-size : 20px ; background : white ;")
