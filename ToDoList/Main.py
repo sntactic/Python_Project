@@ -1,6 +1,6 @@
 from datetime import timedelta
 from PyQt5.QtWidgets import (QWidget , QListWidget , QLabel , QLineEdit ,QListWidgetItem,
-                              QPushButton , QDateTimeEdit , QVBoxLayout , QHBoxLayout)
+                              QPushButton , QDateTimeEdit , QVBoxLayout , QHBoxLayout , QCheckBox)
 from PyQt5.QtCore import QTimer , QDateTime , Qt
 from PyQt5.QtGui import QPixmap, QPalette, QBrush 
 from datetime import datetime , timedelta
@@ -19,7 +19,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 image_path = resource_path("background1.png")
-csv_path = resource_path("taches.csv")
+csv_path : None
 
 
 
@@ -28,18 +28,45 @@ tasks = []
 
 " " "             CREATION DE L' OBJET TASK        """   
 class Tache:
-    def __init__(self , Frame , intitule , echeance ) :
-
+    def __init__(self , Frame , intitule , echeance , stat) :
+        
+        self.done = stat
         self.frame = QHBoxLayout()
         self.wframe = QWidget()
         self.wframe.setLayout(self.frame)
+
+        def task_done():
+            with open(csv_path , "r") as sauvetaches :
+                taches = csv.DictReader(sauvetaches)
+                new_taches = []
+                for tache in taches :
+                    if tache['intitu'] == intitule and tache['echea'] == echeance :
+                        new_taches.append(tache['intitu']+","+tache['echea']+","+"{}".format(self.task_check.isChecked())+"\n")
+                    else :
+                        new_taches.append(tache['intitu']+","+tache['echea']+","+tache['stat']+"\n")
+
+                with open(csv_path , "w") as sauvetaches :
+                    sauvetaches.write("intitu,echea,stat\n")
+                    for dico in new_taches :
+                        sauvetaches.write(dico)
+
+        self.task_check = QCheckBox("")
+        self.task_check.setStyleSheet("color : black; border: 2px solid black ;border-radius: 6px; ")
+        self.task_check.setMaximumWidth(20)
+        self.task_check.stateChanged.connect(task_done)
+        self.frame.addWidget(self.task_check)
+
+        if self.done == "False":  
+            pass
+        else:
+            self.task_check.setCheckState(Qt.Checked)
 
         self.intit = QLabel(text = intitule)
         self.intit.setStyleSheet("color : blue ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
         self.frame.addWidget(self.intit)
 
         self.eche = QLabel(text = "--------")
-        self.eche.setStyleSheet("color : blue ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
+        self.eche.setStyleSheet("color : green ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
         self.frame.addWidget(self.eche)
 
         item = QListWidgetItem()
@@ -48,24 +75,28 @@ class Tache:
         Frame.setItemWidget(item, self.wframe)
 
         def update_time() :
-            temps = datetime.strptime(echeance, "%Y-%m-%d %H:%M:%S")
-            restime = temps - datetime.now()
-            jours = (restime.total_seconds() // 3600) // 24
-            heures = (restime.total_seconds() - (jours * 24 * 3600)) // 3600
-            minutes = (restime.total_seconds() - (jours * 24 * 3600 + heures * 3600)) // 60
-            secondes = restime.total_seconds() % 60 
+            if not self.task_check.isChecked() :
+                temps = datetime.strptime(echeance, "%Y-%m-%d %H:%M:%S")
+                restime = temps - datetime.now()
+                jours = (restime.total_seconds() // 3600) // 24
+                heures = (restime.total_seconds() - (jours * 24 * 3600)) // 3600
+                minutes = (restime.total_seconds() - (jours * 24 * 3600 + heures * 3600)) // 60
+                secondes = restime.total_seconds() % 60 
 
-            if restime > timedelta(days = 0, hours = 0, minutes = 0, seconds = 0) :
-                self.eche.setText("expire dans : {}j {}h {}mn {}s".format(int(jours) , int(heures) , int(minutes) , int(secondes)))
-                if restime > timedelta(days = 0, hours = 2, minutes = 0, seconds = 0) :
-                    self.eche.setStyleSheet("color : green ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
+                if restime > timedelta(days = 0, hours = 0, minutes = 0, seconds = 0) :
+                    self.eche.setText("expire dans : {}j {}h {}mn {}s".format(int(jours) , int(heures) , int(minutes) , int(secondes)))
+                    if restime > timedelta(days = 0, hours = 2, minutes = 0, seconds = 0) :
+                        self.eche.setStyleSheet("color : green ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
+                    else :
+                        self.eche.setStyleSheet("color : orange ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ") 
                 else :
-                    self.eche.setStyleSheet("color : orange ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ") 
-            else :
-                self.eche.setText("expirée")
-                self.eche.setStyleSheet("color : red ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
-                if restime > timedelta(days = 0, hours = 0, minutes = 0, seconds = -0.1)  :
-                    send_mail(intitule)
+                    self.eche.setText("expirée")
+                    self.eche.setStyleSheet("color : red ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
+                    if restime > timedelta(days = 0, hours = 0, minutes = 0, seconds = -0.1)  :
+                        send_mail(intitule)
+            else : 
+                self.eche.setText(" ✅ ")
+                self.eche.setStyleSheet("color : green ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
 
         def est_date(chaine, format_date="%Y-%m-%d %H:%M:%S"):
             try:
@@ -74,7 +105,7 @@ class Tache:
             except ValueError:
                 return False
 
-
+    
         self.timer = QTimer(self.frame)
         if est_date(echeance) :
             self.timer.timeout.connect(update_time)
@@ -83,12 +114,13 @@ class Tache:
 
         " " "             DEFINITION DE LA METHODE DE SUPPRESSION DE TACHES      """   
         def supp() :
-            global tasks 
+            global tasks , csv_path
             self.intit.deleteLater()
             self.eche.deleteLater()
             self.sup.deleteLater()
             self.timer.deleteLater()
             self.frame.deleteLater()
+            self.task_check.deleteLater()
             Frame.takeItem(Frame.row(item))
             self.wframe.deleteLater()
 
@@ -98,10 +130,10 @@ class Tache:
                 new_taches = []
                 for tache in taches :
                     if tache['intitu'] != intitule or tache['echea'] != echeance :
-                        new_taches.append(tache['intitu']+","+tache['echea']+"\n")
+                        new_taches.append(tache['intitu']+","+tache['echea']+","+tache['stat']+"\n")
 
                 with open(csv_path , "w") as sauvetaches :
-                    sauvetaches.write("intitu,echea\n")
+                    sauvetaches.write("intitu,echea,stat\n")
                     for dico in new_taches :
                         sauvetaches.write(dico)
 
@@ -116,24 +148,27 @@ class Tache:
 
 " " "             DEFINITION DA LA FONCTION D'AFFICHAGE LES TACHES PRECEDENTES        """  
 def majTaches(scroll_win) :
-    global tasks
+    global tasks , csv_path
 
     if os.path.exists(csv_path) :
         with open(csv_path , "r") as sauvetaches :
             taches = csv.DictReader(sauvetaches)
             for tache in taches : 
-                tache = Tache(scroll_win , tache['intitu'] , tache['echea'] )
-                tasks.append(tache)
+                task = Tache(scroll_win , tache['intitu'] , tache['echea'] , tache['stat'])
+                tasks.append(task)
     else :
         with open(csv_path , "a") as sauvetaches :
-            sauvetaches.write("intitu,echea\n")
+            sauvetaches.write("intitu,echea,stat\n")
 
 
 
 " " "             CREATION DE LA FENETRE PRINCIPALE        """    
 class mywindow(QWidget) :
-    def __init__(self) :
+    def __init__(self , task_file) :
         super().__init__()
+
+        global csv_path
+        csv_path = csv_path = resource_path(task_file)
         global tasks
         self.taches = []
         """ STYLE DE BASE SE LA FENETRE """
@@ -194,13 +229,13 @@ class mywindow(QWidget) :
                 self.message_vide.setGeometry(350 , 5 , 300 , 20)
             else :
                 self.message_vide.setGeometry(0,0,0,0)
-                tache = Tache(win_task , tex_intit , tex_eche )
+                tache = Tache(win_task , tex_intit , tex_eche , "False")
                 tasks.append(tache)
                 self.taches.append(tache)
                 self.entre_eche.clear()
                 self.entre_intit.clear()
                 with open(csv_path , "a") as sauvetaches :
-                    sauvetaches.write(tex_intit+","+tex_eche+"\n")
+                    sauvetaches.write(tex_intit+","+tex_eche+","+"False"+"\n")
 
         " " "          BOUTTON DE CREATION """
         self.boutton_creer = QPushButton(text = "ajouter✅")
