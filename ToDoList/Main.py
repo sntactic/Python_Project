@@ -19,9 +19,6 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 image_path = resource_path("background1.png")
-csv_path : None
-
-
 
 
 tasks = []
@@ -150,7 +147,7 @@ class Tache:
 def majTaches(scroll_win) :
     global tasks , csv_path
 
-    if os.path.exists(csv_path) :
+    if os.path.exists(csv_path) and os.path.getsize(csv_path)!=0 :
         with open(csv_path , "r") as sauvetaches :
             taches = csv.DictReader(sauvetaches)
             for tache in taches : 
@@ -168,7 +165,7 @@ class mywindow(QWidget) :
         super().__init__()
 
         global csv_path
-        csv_path = csv_path = resource_path(task_file)
+        csv_path = resource_path(task_file)
         global tasks
         self.taches = []
         """ STYLE DE BASE SE LA FENETRE """

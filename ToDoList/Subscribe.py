@@ -1,16 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel , QHBoxLayout , QVBoxLayout , QApplication
-from Main import mywindow
+from PyQt5.QtCore import Qt
 import json , os , sys
-
-def resource_path(relative_path):
-    """Donne le chemin correct vers un fichier, même dans une app PyInstaller"""
-    try:
-        base_path = sys._MEIPASS  
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
-
-log_path = resource_path("Logs.json")
 
 class subs(QWidget):
     def __init__(self):
@@ -38,8 +28,6 @@ class subs(QWidget):
         hlayout3 = QHBoxLayout()
         vlayout.addLayout(hlayout3)
 
-
-        vlayout.addLayout(hlayout2)
         
         # Création des éléments de l'interface
 
@@ -80,8 +68,6 @@ class subs(QWidget):
         self.login_button.setStyleSheet("color : white ; font-size : 20px ; background : green ;border: 2px solid green;border-radius: 6px;padding: 4px;")
         self.login_button.clicked.connect(handle_login)
 
-        self.message_label = QLabel(self)
-        self.message_label.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
 
         def subs_login():
             self.message_label.setGeometry(0 , 0 , 0 , 0)
@@ -91,9 +77,14 @@ class subs(QWidget):
             password = self.password_input.text()
             username = self.username_input.text()
 
+            from Login import json_path
+            if os.path.exists(json_path) :
+                    pass
+            else :
+                open(json_path , "w").close()
             
-            with open(log_path  , "r", encoding = 'utf-8') as log :
-                if os.path.getsize("Logs.json") == 0 :
+            with open(json_path  , "r", encoding = 'utf-8') as log :
+                if os.path.getsize(json_path) == 0 :
                     jregis = {}
                 else :
                     jregis = json.load(log)
@@ -107,7 +98,7 @@ class subs(QWidget):
                         self.message_label.setGeometry(300 , 30 , 450 , 25)
                     else :
                         jregis[mail] = [password , "{}.csv".format(mail)]
-                        with open(log_path  , "w", encoding = 'utf-8') as log :
+                        with open(json_path  , "w", encoding = 'utf-8') as log :
                             json.dump(jregis , log , indent = 4)
                         self.message_label.setText("Vous etes inscrit, Vous pouvez retourner vous connecter")
                         self.message_label.setStyleSheet("color : green ; font-size : 20px ; background : white ;")
@@ -116,7 +107,7 @@ class subs(QWidget):
                         self.username_input.clear()
                         self.password_input.clear()
                         self.mail_input.clear()
-                except AssertionError:
+                except :
                     self.message_label.setText("Donnees incorrecte !!!")
                     self.message_label.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
                     self.message_label.setGeometry(300 , 30 , 450 , 25)
@@ -131,4 +122,11 @@ class subs(QWidget):
         self.subs_button.clicked.connect(subs_login)
         hlayout3.addWidget(self.subs_button)
         hlayout3.addWidget(self.login_button)
+
+        self.installEventFilter(self)
+    def eventFilter(self, obj, event):
+        if event.type() == event.KeyPress and event.key() == Qt.Key_Return:
+            self.subs_button.click() 
+            return True 
+        return super().eventFilter(obj, event)
 

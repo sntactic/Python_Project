@@ -1,5 +1,22 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel , QHBoxLayout , QVBoxLayout
-import json , os
+from PyQt5.QtCore import Qt
+import json , os 
+
+
+def get_user_data_dir():
+    """Retourne un dossier de sauvegarde persistant dans le home de l'utilisateur"""
+    path = os.path.join(os.path.expanduser("~"), ".MonApp")
+    os.makedirs(path, exist_ok=True)
+    return path
+
+def get_csv_path(file):
+    return os.path.join(get_user_data_dir(), file)
+
+def get_json_path():
+    return os.path.join(get_user_data_dir(), "Logs.json")
+
+# Utilisation :
+json_path = get_json_path()
 
 
 class LoginWindow(QWidget):
@@ -50,23 +67,23 @@ class LoginWindow(QWidget):
             global log
             username = self.username_input.text()
             password = self.password_input.text()
-            
-            with open("Logs.json" , "r", encoding = 'utf-8') as log :
-                if os.path.getsize("Logs.json") == 0 :
-                    jregis = {}
-                else :
-                    jregis = json.load(log)
+            try :
+                with open(json_path , "r", encoding = 'utf-8') as log :
+                    if os.path.getsize(json_path) == 0 :
+                        jregis = {}
+                    else :
+                        jregis = json.load(log)
 
-                try :
-                    self.username_input.clear()
-                    self.password_input.clear()
-                    assert jregis[username][0] == password 
-                    window = mywindow(jregis[username][1])
-                    window.show()
-                    self.deleteLater()
-                except :
-                    self.message_label.setText("Nom d'utilisateur ou mot de passe incorrect !!!!!!!!!")
-                    self.message_label.setGeometry(300 , 230 , 450 , 25)
+                        self.username_input.clear()
+                        self.password_input.clear()
+                        assert jregis[username][0] == password 
+                        self.hide()
+                        csv_path = get_csv_path(jregis[username][1])
+                        window = mywindow(csv_path)
+                        window.show()
+            except  :
+                self.message_label.setText("Nom d'utilisateur ou mot de passe incorrect !!!!!!!!!")
+                self.message_label.setGeometry(300 , 230 , 450 , 25)
 
         
             
@@ -75,6 +92,8 @@ class LoginWindow(QWidget):
         self.login_button = QPushButton(text = "Se connecter")
         self.login_button.setStyleSheet("color : white ; font-size : 20px ; background : green ;border: 2px solid green;border-radius: 6px;padding: 4px;")
         self.login_button.clicked.connect(handle_login)
+
+        self.installEventFilter(self)
 
         hlayout3.addWidget(self.login_button)
 
@@ -89,5 +108,12 @@ class LoginWindow(QWidget):
         self.subs_button.setStyleSheet("color : white ; font-size : 20px ; background : blue ;border: 2px solid blue ;border-radius: 6px;padding: 4px;")
         self.subs_button.clicked.connect(handle_subs)
         hlayout3.addWidget(self.subs_button)
+
+        self.installEventFilter(self)
+    def eventFilter(self, obj, event):
+        if event.type() == event.KeyPress and event.key() == Qt.Key_Return:
+            self.login_button.click() 
+            return True 
+        return super().eventFilter(obj, event)
 
         
