@@ -27,7 +27,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt pyinstaller
 
-    - name: Construire l'exécutable avec icône
+    - name: Construire l'exécutable avec icône et images
       run: |
         ICON_PATH=""
         if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
@@ -35,8 +35,9 @@ jobs:
         elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
           ICON_PATH="icon.png"
         fi
-        pyinstaller --noconfirm --onefile --windowed --icon=$ICON_PATH Kha_Task.py
-    
+        pyinstaller --noconfirm --onefile --windowed --icon=$ICON_PATH --add-data "background1.png:." Kha_Task.py
+
+        
     - name: Lister le contenu du dossier dist
       run: |
         ls -l dist/
