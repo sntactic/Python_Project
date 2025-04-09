@@ -35,7 +35,7 @@ jobs:
         elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
           ICON_PATH="icon.png"
         fi
-        pyinstaller --noconfirm --onefile --windowed --icon=$ICON_PATH Reunner.py
+        pyinstaller --noconfirm --onefile --windowed --icon=$ICON_PATH Kha_Task.py
 
     - name: Upload de l’exécutable
       uses: actions/upload-artifact@v3
