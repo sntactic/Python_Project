@@ -2,7 +2,7 @@ from datetime import timedelta
 from PyQt5.QtWidgets import (QWidget , QListWidget , QLabel , QLineEdit ,QListWidgetItem,
                               QPushButton , QDateTimeEdit , QVBoxLayout , QHBoxLayout , QCheckBox)
 from PyQt5.QtCore import QTimer , QDateTime , Qt
-from PyQt5.QtGui import QPixmap, QPalette, QBrush 
+from PyQt5.QtGui import QPixmap, QPalette, QBrush ,QIcon
 from datetime import datetime , timedelta
 import csv , os , sys
 from mail import send_mail
@@ -25,7 +25,7 @@ tasks = []
 
 " " "             CREATION DE L' OBJET TASK        """   
 class Tache:
-    def __init__(self , Frame , intitule , echeance , stat) :
+    def __init__(self , Frame , intitule , echeance , stat , mail) :
         
         self.done = stat
         self.frame = QHBoxLayout()
@@ -90,7 +90,8 @@ class Tache:
                     self.eche.setText("expirée")
                     self.eche.setStyleSheet("color : red ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
                     if restime > timedelta(days = 0, hours = 0, minutes = 0, seconds = -0.1)  :
-                        send_mail(intitule)
+                        print(mail)
+                        send_mail(intitule , mail )
             else : 
                 self.eche.setText(" ✅ ")
                 self.eche.setStyleSheet("color : green ; font-size : 20px ; background-color: rgba(0, 0, 0, 0) ;")
@@ -145,14 +146,14 @@ class Tache:
 
 
 " " "             DEFINITION DA LA FONCTION D'AFFICHAGE LES TACHES PRECEDENTES        """  
-def majTaches(scroll_win) :
+def majTaches(scroll_win , mail) :
     global tasks , csv_path
 
     if os.path.exists(csv_path) and os.path.getsize(csv_path)!=0 :
         with open(csv_path , "r") as sauvetaches :
             taches = csv.DictReader(sauvetaches)
             for tache in taches : 
-                task = Tache(scroll_win , tache['intitu'] , tache['echea'] , tache['stat'])
+                task = Tache(scroll_win , tache['intitu'] , tache['echea'] , tache['stat'] , mail)
                 tasks.append(task)
     else :
         with open(csv_path , "a") as sauvetaches :
@@ -162,7 +163,7 @@ def majTaches(scroll_win) :
 
 " " "             CREATION DE LA FENETRE PRINCIPALE        """    
 class mywindow(QWidget) :
-    def __init__(self , task_file) :
+    def __init__(self , task_file , mail) :
         super().__init__()
 
         global csv_path
@@ -173,6 +174,7 @@ class mywindow(QWidget) :
         self.setWindowTitle("TO DO LIST")
         self.move(200 , 100)
         self.resize(1080 , 720)
+        self.setWindowIcon(QIcon("icon.png"))
 
         layout = QVBoxLayout(self)
         layout.setSpacing(10)
@@ -213,7 +215,7 @@ class mywindow(QWidget) :
 
         """ MISE A JOUR DES TACHES SAUVEGARDEES"""  
 
-        majTaches(win_task)
+        majTaches(win_task , mail)
 
         " " "             CREATION DE LA D' AJOUT D' AJOUT DE TACHES       """   
         def ajout() :
@@ -227,7 +229,7 @@ class mywindow(QWidget) :
                 self.message_vide.setGeometry(350 , 5 , 300 , 20)
             else :
                 self.message_vide.setGeometry(0,0,0,0)
-                tache = Tache(win_task , tex_intit , tex_eche , "False")
+                tache = Tache(win_task , tex_intit , tex_eche , "False" , mail)
                 tasks.append(tache)
                 self.taches.append(tache)
                 self.entre_eche.clear()

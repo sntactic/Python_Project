@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel , QHBoxLayout , QVBoxLayout
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt 
+from PyQt5.QtGui import QIcon
 import json , os 
-
 
 def get_user_data_dir():
     """Retourne un dossier de sauvegarde persistant dans le home de l'utilisateur"""
@@ -27,6 +27,7 @@ class LoginWindow(QWidget):
         self.setStyleSheet("background : white;")
         self.move(200 , 100)
         self.resize(1080 , 720)
+        self.setWindowIcon(QIcon("icon.png"))
         
 
         vlayout = QVBoxLayout()
@@ -79,7 +80,7 @@ class LoginWindow(QWidget):
                         assert jregis[username][0] == password 
                         self.hide()
                         csv_path = get_csv_path(jregis[username][1])
-                        window = mywindow(csv_path)
+                        window = mywindow(csv_path  , username)
                         window.show()
             except  :
                 self.message_label.setText("Nom d'utilisateur ou mot de passe incorrect !!!!!!!!!")

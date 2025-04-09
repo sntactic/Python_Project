@@ -1,12 +1,12 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-def send_mail(texte) :
+def send_mail(texte , mail) :
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     email_sender = "khadim.ahmad.mbaye@gmail.com"
     email_password = "odhd tpwv nwwr okjt" 
-    email_receiver = "mbaye.khadim4@ugb.edu.sn"
+    email_receiver = mail
 
     # Création du message
     message = MIMEMultipart()

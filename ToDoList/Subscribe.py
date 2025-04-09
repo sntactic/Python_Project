@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel , QHBoxLayout , QVBoxLayout , QApplication
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 import json , os , sys
 
 class subs(QWidget):
@@ -10,6 +11,7 @@ class subs(QWidget):
         self.setStyleSheet("background : white;")
         self.move(200 , 100)
         self.resize(1080 , 720)
+        self.setWindowIcon(QIcon("icon.png"))
         
 
         vlayout = QVBoxLayout()
