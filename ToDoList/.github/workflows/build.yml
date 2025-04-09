@@ -36,9 +36,13 @@ jobs:
           ICON_PATH="icon.png"
         fi
         pyinstaller --noconfirm --onefile --windowed --icon=$ICON_PATH Kha_Task.py
+    
+    - name: Lister le contenu du dossier dist
+      run: |
+        ls -l dist/
 
     - name: Upload de l’exécutable
       uses: actions/upload-artifact@v3
       with:
         name: build-${{ matrix.os }}
-        path: dist/
+        path: dist/Kha_Task/*
