@@ -137,6 +137,7 @@ class Tache:
         " " "             CREATION DU BOUTTON DE SUPPRESSION       """   
         self.sup = QPushButton(text ="supprimer")
         self.sup.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
+        self.sup.setMaximumWidth(120)
         self.sup.clicked.connect(supp)
         self.frame.addWidget(self.sup)
 
