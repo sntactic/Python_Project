@@ -12,7 +12,6 @@ class subs(QWidget):
         self.move(200 , 100)
         self.resize(1080 , 720)
         self.setWindowIcon(QIcon("icon.png"))
-        
 
         vlayout = QVBoxLayout()
         vlayout.setSpacing(100)

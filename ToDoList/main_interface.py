@@ -18,7 +18,7 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
-image_path = resource_path("background1.png")
+image_path = resource_path("background.png")
 
 
 tasks = []
