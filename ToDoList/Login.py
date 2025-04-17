@@ -64,7 +64,7 @@ class LoginWindow(QWidget):
         self.message_label.setStyleSheet("color : red ; font-size : 20px ; background : white ;")
 
         def handle_login():
-            from Main import mywindow
+            from main_interface import mywindow
             global log
             username = self.username_input.text()
             password = self.password_input.text()

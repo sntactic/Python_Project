@@ -4,8 +4,8 @@ from email.mime.multipart import MIMEMultipart
 def send_mail(texte , mail) :
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
-    email_sender = "khadim.ahmad.mbaye@gmail.com"
-    email_password = "odhd tpwv nwwr okjt" 
+    email_sender = "kha.to.do.list.py@gmail.com"
+    email_password = "gpjt lknf xphn jhsu" 
     email_receiver = mail
 
     # Création du message
