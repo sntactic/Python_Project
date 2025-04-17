@@ -1,1 +1,1 @@
-j’expose sur ce dépôt mes projets entie faite avec python 
+j’expose sur ce dépôt mes projets entièrement faite avec python 
